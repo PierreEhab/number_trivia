@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:number_trivia/core/errors/failures.dart';
@@ -34,34 +33,35 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
       if (event is GetTriviaForConcreteNumber) {
         final inputEither =
             inputConverter.stringToUnsignedInteger(event.numberString);
-        print(inputEither);
-        inputEither.fold(
+        await inputEither.fold(
           (failure) {
             emit(const Error(errorMessage: invalidInputFailureMessage));
           },
           (integer) async {
-            print(integer);
             emit(Loading());
             final failureOrTrivia = await getConcreteNumberTrivia(
               Params(
                 number: integer,
               ),
             );
-            print(failureOrTrivia);
-            failureOrTrivia!.fold(
-              (failure) => emit(
-                Error(errorMessage: _mapFailureToMessage(failure!)),
-              ),
-              (trivia) => emit(
-                Loaded(
-                  trivia: trivia!,
-                ),
-              ),
+            await failureOrTrivia!.fold(
+              (failure) async {
+                emit(
+                  Error(errorMessage: _mapFailureToMessage(failure!)),
+                );
+              },
+              (trivia) async{
+                emit(
+                  Loaded(
+                    trivia: trivia!,
+                  ),
+                );
+              }
             );
           },
         );
       }
-      else if( event is GetTriviaForRandomNumber){
+      else if(event is GetTriviaForRandomNumber){
         emit(Loading());
         final failureOrTrivia = await getRandomNumberTrivia(NoParams());
         failureOrTrivia!.fold(

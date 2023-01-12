@@ -48,6 +48,6 @@ Future<void> init() async {
   // - EXTERNAL
   final sharedPreferences = await SharedPreferences.getInstance();
   serviceLocator.registerLazySingleton(()  => sharedPreferences);
-  serviceLocator.registerLazySingleton(() => http.Client);
+  serviceLocator.registerLazySingleton(() => http.Client());
   serviceLocator.registerLazySingleton(() => InternetConnectionChecker());
 }
